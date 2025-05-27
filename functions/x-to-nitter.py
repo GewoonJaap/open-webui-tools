@@ -49,7 +49,7 @@ class Filter:
         enabled: bool = Field(default=True, description="Enable X to Nitter rewriting.")
         status_updates: bool = Field(default=True, description="Show rewriting status updates.")
         with_replies: bool = Field(default=False, description="Append /with_replies to user profile URLs.")
-        process_tool_args: bool = Field(default=True, description="Process JSON Args in Tool Functions (If Valid JSON)") # Added option so that it can be turned off.
+        process_tool_args: bool = Field(default=True, description="Process JSON Args in Tool Functions (If Valid JSON)")  # Added option so that it can be turned off.
         pass
 
     def __init__(self):
@@ -69,11 +69,13 @@ class Filter:
         emitter = EventEmitter(__event_emitter__)
 
         messages = body["messages"]
+        total_urls_rewritten = 0 #Keep track if any URLs are rewritten.
 
         for message in messages:
             if message["role"] == "user" or message["role"] == "assistant":
                 rewritten_content, urls_rewritten = await self.rewrite_x_to_nitter(message["content"], __event_emitter__)
                 message["content"] = rewritten_content
+                total_urls_rewritten += urls_rewritten
 
         # Also process tool outputs
         if "tool_calls" in body:
@@ -81,6 +83,7 @@ class Filter:
                 if "content" in tool_call:
                     rewritten_content, urls_rewritten = await self.rewrite_x_to_nitter(tool_call["content"], __event_emitter__)
                     tool_call["content"] = rewritten_content
+                    total_urls_rewritten += urls_rewritten
 
         # Process tool outputs for the 'new' format
         if "response" in body and body["response"] and "tool_calls" in body["response"]:
@@ -100,7 +103,10 @@ class Filter:
                 if "content" in tool_call:  # Added to account for tool calls that return string content directly
                     rewritten_content, urls_rewritten = await self.rewrite_x_to_nitter(tool_call["content"], __event_emitter__)
                     tool_call["content"] = rewritten_content
-        await emitter.complete_update("All X URLs rewritten to Nitter (if enabled).")  # Completion status after all is done
+                    total_urls_rewritten += urls_rewritten
+
+        if self.valves.status_updates and total_urls_rewritten > 0:
+            await emitter.complete_update("All X URLs rewritten to Nitter (if enabled).")  # Completion status after all is done
 
         return body
 
