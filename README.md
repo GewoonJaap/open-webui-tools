@@ -44,4 +44,31 @@ If you encounter any problems or have suggestions, please open an [issue](https:
 
 ---
 
+## Available Tools
+
+This repository provides the following tools, each with its own folder and documentation:
+
+### Tools
+- **Flight Data Provider** (`tools/flight_tracker/flight_tracker.py`)
+  - Fetches flight data for a specified flight number using flight-status.com via the Jina API.
+  - See: `tools/flight_tracker/DESCRIPTION.md` and `FUNCTIONS.md`
+- **Google Maps Text Search** (`tools/google_maps/google-maps-tool.py`)
+  - Returns place suggestions for a specified query and location using the Google Maps Text Search API.
+  - See: `tools/google_maps/DESCRIPTION.md` and `FUNCTIONS.md`
+- **Google Veo Video Generator** (`tools/veo_2/veo-video-gen.py`)
+  - Generates videos using Google's Veo API based on text prompts or images.
+  - See: `tools/veo_2/DESCRIPTION.md` and `FUNCTIONS.md`
+- **Replicate VEO 3 Video Generator** (`tools/veo_3/veo-3-replicate-video-gen.py`)
+  - Generates videos using Replicate's VEO 3 API based on text prompts.
+  - See: `tools/veo_3/DESCRIPTION.md` and `FUNCTIONS.md`
+
+### Functions
+- **x_to_nitter** (`functions/x-to-nitter/x-to-nitter.py`)
+  - Converts a Twitter/X URL to its equivalent Nitter URL for privacy-friendly viewing.
+  - See: `functions/x-to-nitter/FUNCTIONS.md`
+
+Each tool and function is documented in its respective folder. For details on usage, configuration (valves), and API, see the `DESCRIPTION.md` and `FUNCTIONS.md` files in each tool's directory.
+
+---
+
 Built and maintained by [GewoonJaap](https://github.com/GewoonJaap).
