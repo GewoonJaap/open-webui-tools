@@ -3,8 +3,7 @@ title: Google Veo Video Generator
 author: AI Assistant
 description: A tool that generates videos using Google's Veo API based on text prompts.
 requirements: requests
-author: https://github.com/GewoonJaap/open-webui-tools/
-version: 0.1.0
+version: 0.1.1
 license: MIT
 """
 
@@ -54,7 +53,7 @@ class Tools:
             description="Base URL for the Google Veo API.",
         )
         PROXY_URL: str = Field(
-            default="https://veo-proxy.mrproper.dev/veo",
+            default="https://ai-asset-proxy.mrproper.dev/api/gemini/veo",
             description="Proxy URL for serving Veo videos.",
         )
         CITATION: bool = Field(
@@ -84,9 +83,9 @@ class Tools:
         prompt: str,
         aspect_ratio: str = "16:9",
         negative_prompt: Optional[str] = None,
-        person_generation: str = "dont_allow",
+        person_generation: str = "allow_adult",
         number_of_videos: int = 1,
-        duration_seconds: int = 5,
+        duration_seconds: int = 8,
         enhance_prompt: bool = True,
         image: Optional[str] = None,
         __event_emitter__: Callable[[dict], Any] = None,
@@ -170,6 +169,8 @@ class Tools:
             parameters = {
                 "aspectRatio": aspect_ratio,
                 "personGeneration": person_generation,
+                "sampleCount": number_of_videos,
+                "durationSeconds": duration_seconds,
             }
 
             # Add negative prompt if provided
@@ -276,7 +277,9 @@ class Tools:
                         )
                         return response_text.strip()
                     else:
-                        raise Exception("No video URLs found in the response")
+                        raise Exception(
+                            f"No video URLs found in the response. {status_data}"
+                        )
                 else:
                     retry_count += 1
                     await emitter.progress_update(
