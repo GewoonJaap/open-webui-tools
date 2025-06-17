@@ -4,7 +4,7 @@ author: GardenSnakes
 author_url: https://github.com/GewoonJaap/open-webui-tools
 description: A tool that returns place suggestions, including photos, full reviews, and emits citations (with specific source title), for a specified query using the Google Maps Text Search (New) API, formatted in Markdown.
 requirements: requests
-version: 0.0.9
+version: 0.0.11
 license: MIT
 """
 
@@ -99,6 +99,16 @@ class Tools:
         __event_emitter__: Callable[[dict], Any] = None,
         __user__: dict = {}, 
     ) -> str:
+        """
+        Provides place suggestions based on a text query using the Google Maps Text Search (New) API.
+        Includes a photo and specified number of full reviews for each place if available. Emits citations per place.
+        Results are formatted in Markdown.
+        :param query: The text query to search for (e.g., "restaurants in San Francisco", "Eiffel Tower").
+        :param max_results: The maximum number of place suggestions to return (default is 3, max is 20).
+        :param max_photo_width: The maximum width of the photo to display (default is 400px).
+        :param max_reviews_per_place: The maximum number of full reviews to display per place (default is 5).
+        :return: Markdown formatted details about the places found or an error message.
+        """
         emitter = EventEmitter(__event_emitter__)
 
         try:
@@ -125,6 +135,7 @@ class Tools:
                 "X-Goog-Api-Key": api_key,
                 "X-Goog-FieldMask": field_mask,
             }
+            # Data payload without locationBias
             data = {"textQuery": query, "pageSize": max_results}
 
             await emitter.progress_update(f"Fetching data for query: {query} with {max_results} results.")
@@ -197,11 +208,10 @@ class Tools:
                 place_markdown_content += "\n---\n\n"
 
                 if self.citation_enabled and __event_emitter__:
-                    # Format the citation title as requested
                     citation_title = f"Google Maps - {name}" 
                     await emitter._emit_citation( 
                         url=maps_uri, 
-                        title=citation_title, # Use the newly formatted title 
+                        title=citation_title, 
                         content=place_markdown_content 
                     )
                 
